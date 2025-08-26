@@ -94,8 +94,15 @@ public class EnvoiColis {
     }
     
     @GetMapping("/delivery/arrivee/")
-    public ResponseEntity<List<Delivery>> getAllDeliveriesForReceivers(HttpSession session) {
-    	String city = (String) session.getAttribute("ville");
+    public ResponseEntity<List<Delivery>> getAllDeliveriesForReceivers(@RequestHeader(name = "Authorization") String authorizationHeader) {
+        String token = authorizationHeader.substring(7);
+
+        System.out.println("hey : "+token);
+        // Get all claims from the token
+        Claims claims = jwtTokenUtil.getClaimFromToken(token, c -> c);
+
+        // Retrieve the 'agence' attribute
+        String city = (String) claims.get("agence");        
         Iterable<Delivery> deliveriesIterable = deliveryService.findDeliveryByVilleArrivee(city);
         List<Delivery> deliveries = new ArrayList<>();
         deliveriesIterable.forEach(deliveries::add);
