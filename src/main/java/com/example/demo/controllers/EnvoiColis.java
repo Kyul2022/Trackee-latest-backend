@@ -109,19 +109,20 @@ public class EnvoiColis {
         return new ResponseEntity<>(deliveries, HttpStatus.OK);
     }
     
-    @GetMapping("/package/arrivee/{deliveryId}")
-    public ResponseEntity<List<Package>> getPackagesForDeliveryForReceivers(@PathVariable String deliveryId, HttpSession session) {
-    	String city = (String) session.getAttribute("ville");
+    @GetMapping("/package/arrivee")
+    public ResponseEntity<List<Package>> getPackagesForDeliveryForReceivers(@RequestHeader(name = "Authorization") String authorizationHeader) {
+        String token = authorizationHeader.substring(7);
+
+        System.out.println("hey : "+token);
+        // Get all claims from the token
+        Claims claims = jwtTokenUtil.getClaimFromToken(token, c -> c);
+
+        // Retrieve the 'agence' attribute
+        String city = (String) claims.get("agence");        
         Iterable<Package> packages = packageService.gePackagesArrived(city);
-        List<Package> finalSet = new ArrayList<>();
-        Iterator<Package> it = packages.iterator();
-        while(it.hasNext()) {
-        	Package P = it.next();
-        	if(P.getDeliveriesPassedBy().get(0).getLabelLivraison().equals(deliveryId)) {
-        		finalSet.add(P);
-        	}
-        }
-        return new ResponseEntity<>(finalSet, HttpStatus.OK);
+        List<Package> packagesList = StreamSupport.stream(packages.spliterator(), false)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(packagesList, HttpStatus.OK);
     }
     
     @GetMapping("/delivery/packages/{deliveryId}")

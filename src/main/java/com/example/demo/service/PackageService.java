@@ -5,9 +5,6 @@ import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-//import com.example.demo.model.Bus;
-import com.example.demo.model.Delivery;
 import com.example.demo.model.Package;
 import com.example.demo.repositories.PackageRepository;
 
